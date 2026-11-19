@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-Ubvfs7Di/rifn0qGx72bMGTLPNo7NM6++tIGVsW8oOE='; base-uri 'none'; form-action 'none'">
+<title>vitrine-os · autorização Mercado Livre</title>
+<style>
+  body { font: 16px/1.5 system-ui, -apple-system, sans-serif; max-width: 34rem; margin: 2rem auto; padding: 0 1rem; color: #1d1d1f; }
+  h1 { font-size: 1.25rem; }
+  .caixa { border: 1px solid #d2d2d7; border-radius: 10px; padding: 1rem; margin: 1rem 0; }
+  .ok { border-color: #34c759; } .erro { border-color: #ff3b30; }
+  textarea { width: 100%; font: 14px ui-monospace, monospace; padding: .5rem; box-sizing: border-box; }
+  button { font: inherit; padding: .5rem 1rem; border-radius: 8px; border: 1px solid #1d1d1f; background: #fff; }
+  small { color: #6e6e73; }
+</style>
+</head>
+<body>
+<h1>vitrine-os · retorno do Mercado Livre</h1>
+<div id="saida" class="caixa">Lendo resposta…</div>
+<p><small>Esta página não envia nada a lugar nenhum: só mostra o código para você colar no terminal onde rodou
+<code>scripts/ml_autorizar.py</code>. O código sozinho não dá acesso à conta: a troca por token exige o
+Client Secret e o verificador PKCE, que ficam só na sua máquina.</small></p>
+<script>
+(function () {
+  var p = new URLSearchParams(window.location.search);
+  var out = document.getElementById('saida');
+  var code = p.get('code'), state = p.get('state'), erro = p.get('error');
+  // remove o código da barra de endereço e do histórico
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState(null, '', window.location.pathname);
+  }
+  out.textContent = '';
+  function linha(txt) { var d = document.createElement('p'); d.textContent = txt; out.appendChild(d); return d; }
+  if (erro) {
+    out.className = 'caixa erro';
+    linha('O Mercado Livre devolveu erro: ' + erro);
+    var desc = p.get('error_description');
+    if (desc) { linha(desc); }
+    return;
+  }
+  if (!code) {
+    linha('Nenhum código recebido. Abra esta página pelo link gerado por scripts/ml_autorizar.py.');
+    return;
+  }
+  out.className = 'caixa ok';
+  linha('Autorização recebida. Copie o código e cole no terminal:');
+  var t = document.createElement('textarea');
+  t.readOnly = true; t.rows = 3; t.value = code; out.appendChild(t);
+  var b = document.createElement('button');
+  b.type = 'button'; b.textContent = 'Copiar código';
+  b.addEventListener('click', function () {
+    t.select();
+    if (navigator.clipboard) { navigator.clipboard.writeText(code); } else { document.execCommand('copy'); }
+    b.textContent = 'Copiado';
+  });
+  out.appendChild(b);
+  if (state) { linha('state: ' + state + ' (o script confere se é o mesmo que ele gerou)'); }
+  linha('Use logo: o código expira.');
+})();
+</script>
+</body>
+</html>
