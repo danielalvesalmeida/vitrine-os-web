@@ -222,7 +222,16 @@
       var email = $("login-email").value.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg("login-msg", "E-mail inválido."); return; }
       api.entrar(email).then(function () { msg("login-msg", "Link enviado. Abra o e-mail neste celular.", true); })
-        .catch(erro("login-msg"));
+        .catch(function (e) {
+          var m = (e && e.message) || String(e);
+          if (/signups? not allowed|otp_disabled|not allowed for otp/i.test(m)) {
+            m = "Este e-mail ainda não tem acesso: ou não foi convidado, ou o convite ainda não foi aceito. " +
+                "Abra o e-mail de convite (\"You have been invited\") ou peça ao admin para reenviar.";
+          } else if (/rate limit|too many|security purposes/i.test(m)) {
+            m = "Muitos pedidos seguidos. Aguarde um minuto e tente de novo.";
+          }
+          msg("login-msg", m);
+        });
     });
     $("btn-sair").addEventListener("click", function () { api.sair().then(function () { location.reload(); }); });
     $("btn-novo").addEventListener("click", novo);
