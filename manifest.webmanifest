@@ -1,0 +1,10 @@
+{
+  "name": "vitrine-os · captura",
+  "short_name": "vitrine",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#111111",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

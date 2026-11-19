@@ -2,64 +2,75 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-Ubvfs7Di/rifn0qGx72bMGTLPNo7NM6++tIGVsW8oOE='; base-uri 'none'; form-action 'none'">
-<title>vitrine-os · autorização Mercado Livre</title>
-<style>
-  body { font: 16px/1.5 system-ui, -apple-system, sans-serif; max-width: 34rem; margin: 2rem auto; padding: 0 1rem; color: #1d1d1f; }
-  h1 { font-size: 1.25rem; }
-  .caixa { border: 1px solid #d2d2d7; border-radius: 10px; padding: 1rem; margin: 1rem 0; }
-  .ok { border-color: #34c759; } .erro { border-color: #ff3b30; }
-  textarea { width: 100%; font: 14px ui-monospace, monospace; padding: .5rem; box-sizing: border-box; }
-  button { font: inherit; padding: .5rem 1rem; border-radius: 8px; border: 1px solid #1d1d1f; background: #fff; }
-  small { color: #6e6e73; }
-</style>
+<meta name="theme-color" content="#111111">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+<title>vitrine-os · captura</title>
 </head>
 <body>
-<h1>vitrine-os · retorno do Mercado Livre</h1>
-<div id="saida" class="caixa">Lendo resposta…</div>
-<p><small>Esta página não envia nada a lugar nenhum: só mostra o código para você colar no terminal onde rodou
-<code>scripts/ml_autorizar.py</code>. O código sozinho não dá acesso à conta: a troca por token exige o
-Client Secret e o verificador PKCE, que ficam só na sua máquina.</small></p>
-<script>
-(function () {
-  var p = new URLSearchParams(window.location.search);
-  var out = document.getElementById('saida');
-  var code = p.get('code'), state = p.get('state'), erro = p.get('error');
-  // remove o código da barra de endereço e do histórico
-  if (window.history && window.history.replaceState) {
-    window.history.replaceState(null, '', window.location.pathname);
-  }
-  out.textContent = '';
-  function linha(txt) { var d = document.createElement('p'); d.textContent = txt; out.appendChild(d); return d; }
-  if (erro) {
-    out.className = 'caixa erro';
-    linha('O Mercado Livre devolveu erro: ' + erro);
-    var desc = p.get('error_description');
-    if (desc) { linha(desc); }
-    return;
-  }
-  if (!code) {
-    linha('Nenhum código recebido. Abra esta página pelo link gerado por scripts/ml_autorizar.py.');
-    return;
-  }
-  out.className = 'caixa ok';
-  linha('Autorização recebida. Copie o código e cole no terminal:');
-  var t = document.createElement('textarea');
-  t.readOnly = true; t.rows = 3; t.value = code; out.appendChild(t);
-  var b = document.createElement('button');
-  b.type = 'button'; b.textContent = 'Copiar código';
-  b.addEventListener('click', function () {
-    t.select();
-    if (navigator.clipboard) { navigator.clipboard.writeText(code); } else { document.execCommand('copy'); }
-    b.textContent = 'Copiado';
-  });
-  out.appendChild(b);
-  if (state) { linha('state: ' + state + ' (o script confere se é o mesmo que ele gerou)'); }
-  linha('Use logo: o código expira.');
-})();
-</script>
+<header><strong>vitrine-os</strong><span id="loja-nome"></span><button id="btn-sair" class="link" hidden>Sair</button></header>
+<main>
+  <section id="tela-carregando"><p>Carregando…</p></section>
+
+  <section id="tela-login" hidden>
+    <h1>Entrar</h1>
+    <p>Enviamos um link de acesso para o seu e-mail.</p>
+    <label>E-mail <input id="login-email" type="email" autocomplete="email" inputmode="email"></label>
+    <button id="btn-login" class="primario">Enviar link</button>
+    <p id="login-msg" class="msg"></p>
+  </section>
+
+  <section id="tela-lojas" hidden>
+    <h1>Escolha a loja</h1>
+    <div id="lista-lojas" class="lista"></div>
+  </section>
+
+  <section id="tela-home" hidden>
+    <button id="btn-novo" class="primario grande">+ Nova máquina</button>
+    <h2>Recentes</h2>
+    <div id="lista-itens" class="lista"></div>
+  </section>
+
+  <section id="tela-novo" hidden>
+    <h1>Nova máquina</h1>
+    <label>Tipo <select id="novo-perfil"></select></label>
+    <label>SKU <input id="novo-sku" autocapitalize="characters"></label>
+    <label>Custo de compra (R$) <input id="novo-custo" type="number" inputmode="decimal" min="0" step="0.01" placeholder="opcional"></label>
+    <button id="btn-criar" class="primario">Começar fotos</button>
+    <button id="btn-cancelar-novo" class="link">Cancelar</button>
+    <p id="novo-msg" class="msg"></p>
+  </section>
+
+  <section id="tela-captura" hidden>
+    <p class="passo"><span id="cap-passo"></span> · <span id="cap-sku"></span></p>
+    <h1 id="cap-rotulo"></h1>
+    <p id="cap-papel" class="sub"></p>
+    <img id="cap-preview" alt="" hidden>
+    <label class="primario grande" id="lbl-foto">Tirar foto
+      <input id="cap-input" type="file" accept="image/*" capture="environment" hidden>
+    </label>
+    <div class="linha">
+      <button id="btn-pular" class="link">Pular este passo</button>
+      <button id="btn-terminar" class="link">Terminar</button>
+    </div>
+    <p id="cap-msg" class="msg"></p>
+    <div id="cap-fila" class="sub"></div>
+  </section>
+
+  <section id="tela-fim" hidden>
+    <h1>Fotos enviadas</h1>
+    <p id="fim-resumo"></p>
+    <button id="btn-reenviar" class="primario" hidden>Reenviar as que falharam</button>
+    <button id="btn-voltar" class="primario">Voltar ao estoque</button>
+  </section>
+</main>
+<script src="config.js"></script>
+<script src="vendor/supabase-2.119.2.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,25 @@
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; font: 17px/1.45 system-ui, -apple-system, sans-serif; color: #111; background: #fafafa; }
+header { display: flex; gap: .75rem; align-items: center; padding: .75rem 1rem; background: #111; color: #fff;
+  padding-top: max(.75rem, env(safe-area-inset-top)); }
+header #loja-nome { opacity: .7; font-size: .9rem; flex: 1; }
+header .link { color: #fff; }
+main { max-width: 30rem; margin: 0 auto; padding: 1rem; }
+h1 { font-size: 1.35rem; margin: .5rem 0; }
+h2 { font-size: 1rem; margin: 1.5rem 0 .5rem; color: #555; }
+label { display: block; margin: .75rem 0; font-size: .9rem; color: #444; }
+input, select { display: block; width: 100%; margin-top: .25rem; padding: .7rem; font: inherit;
+  border: 1px solid #ccc; border-radius: 10px; background: #fff; }
+button, .primario { font: inherit; border: 0; border-radius: 12px; padding: .8rem 1rem; cursor: pointer; }
+.primario { display: block; width: 100%; text-align: center; background: #111; color: #fff; margin: .75rem 0; }
+.grande { padding: 1.2rem; font-size: 1.15rem; }
+.link { background: none; color: #0a58ca; padding: .5rem 0; }
+.linha { display: flex; justify-content: space-between; }
+.lista > * { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid #e5e5e5;
+  border-radius: 12px; padding: .75rem 1rem; margin-bottom: .5rem; }
+.lista small { color: #666; }
+.msg { color: #b00020; min-height: 1.2em; }
+.msg.ok { color: #1b7f3b; }
+.passo, .sub { color: #666; font-size: .9rem; margin: 0; }
+#cap-preview { width: 100%; border-radius: 12px; margin: .5rem 0; max-height: 40vh; object-fit: contain; background: #eee; }
